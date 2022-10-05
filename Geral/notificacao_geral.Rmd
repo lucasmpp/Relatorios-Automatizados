@@ -1,0 +1,687 @@
+--- 
+title: ' '
+author: ''
+date: ''
+output:
+  pdf_document:
+    fig_crop: no
+    highlight: tango
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+    includes:
+      in_header: Estilo.sty
+  html_document:
+    df_print: paged
+  word_document: default
+sansfont: Calibri Light
+classoption: a4paper
+always_allow_html: yes
+---
+
+\rhead{\fontsize{8pt}{10pt} \selectfont Núcleo de Segurança do Paciente
+\\ \fontsize{8pt}{10pt} \selectfont Centro Nacional de Controle de Qualidade
+}
+\begin{center}
+ {\LARGE Relatório de Notificações}
+\end{center}
+\vspace{0.5cm}
+
+
+```{r setup, include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+
+
+pacman::p_load("knitr","tidyverse","lubridate","janitor","kableExtra","png")
+
+source("../Scripts/utils.R", encoding = "UTF-8")
+source("../Scripts/tabelas.R", encoding = "UTF-8")
+source("../Scripts/graficos.R", encoding = "UTF-8")
+
+setwd("//BSBFILE01/CNCQ/Nucleo de Segurança do Paciente/Relatórios assistencia/Programas/Geral")
+
+remover_imagens()
+```
+
+
+
+```{r, include=FALSE, echo=FALSE}
+#dados de novembro e dezembro aparecendo!!!
+dia = 01
+mes =  Sys.Date() %>% month()-1
+anos = Sys.Date() %>% year()
+
+
+periodo_final = paste0(anos,"-",mes,"-",dia)
+periodo_final = periodo.final(perido_final)
+periodo_final
+
+periodo_inicial = periodo.inicial(periodo_final,tipo_date = "anual")
+periodo_inicial
+
+
+```
+
+
+\section{NOTIFICAÇÕES – Ano 2021}
+
+\subsection{Quedas Geral}
+
+```{r, echo=F, warning=F, message=F}
+
+data_notific = ler_excel("../Notificações.xlsx")
+
+```
+
+```{r, echo=F, warning=F, message=F}
+
+#tabela dupla - Classificação da queda de acordo com o dano mês a mês 
+
+double_table(data_notific, 
+             incidente = "Queda", 
+             var_indica = "CLASSIFICA",var_explica = "mes_ext", nome_coluna = "Classificação do Incidente",
+             caption = "Distribuição das quedas mês a mês de acordo com o dano.") 
+
+```
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com o período
+
+donutplot(data_notific, 
+          incidente = "Queda", 
+          var_secundaria = "Horário do incidente",
+          tamanho = 4, paleta = 1,
+          path_image = "queda_periodo.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição da queda de acordo com o período.}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_periodo.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F, results="asis",include=F}
+#grafico donut - Presença de acompanhante no momento da queda
+
+donutplot(data_notific, 
+          incidente = "Queda", 
+          var_secundaria = "QUED_Acomp",
+          tamanho = 4, paleta = 2,
+          path_image = "queda_acomp.png")
+```
+
+\begin{figure}[H]
+\caption{Presença de acompanhante no momento da queda.}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_acomp.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F,include=F}
+# #gráfico donut - Distribuição do gênero nas notificações em Procedimento Cirúrgico
+
+donutplot(data_notific,
+          incidente = "Queda",
+          var_secundaria = "SEXO",
+          tamanho = 4, paleta = 3,
+          path_image = "cirurg_SEXO.png")
+
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Procedimento Cirúrgico.}
+\includegraphics[width=0.7\textwidth]{Imagens/cirurg_SEXO.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com a faixa etária
+
+donutplot(data_notific, 
+          incidente = "Queda", 
+          var_secundaria = "FAIXA_ETARIA",
+          tamanho = 4, paleta = 1,
+          path_image = "queda_faixa_etaria.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição da queda de acordo com a faixa etária.}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_faixa_etaria.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Dano decorrente da queda  
+
+double_table(data_notific, 
+             incidente = "Queda", 
+             var_indica = "QUED_Dano",var_explica = "CLASSIFICA", nome_coluna = "Classificação do Incidente",
+             caption = "Dano decorrente da queda (evento adverso)") 
+
+```
+
+
+```{r, echo=F, warning=F, message=F, results="asis"}
+#tabela simples - Motivo da queda
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Motivo", nome_coluna = "Motivo da Queda",
+            caption = "Motivo da queda.")
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Atividade durante a queda 
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Atividade", nome_coluna = "Atividade",
+            caption = "Atividade durante a queda.")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Superfície envolvida na queda 
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Superficie", nome_coluna = "Superfície",
+            caption = "Superfície envolvida na queda.")
+
+```
+  
+  
+\subsection{Lesão por Pressão (LP)}
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Tipo de Lesão por Pressão 
+
+double_table(data_notific, 
+             incidente = "Lesão por pressão", 
+             var_indica = "LPRES_Tipo",var_explica = "mes_ext", nome_coluna = "Tipo de lesão",
+             caption = "Tipo de Lesão por Pressão.") 
+
+```
+
+
+\subsubsection{Lesão por Pressão em Proeminência Óssea}
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Tipo de LP em proeminência óssea
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_PO_Tipo",
+            filtro = "Em proeminências ósseas",
+            nome_coluna = "Tipo",
+            caption = "Tipo de LP em proeminência óssea")
+
+```
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include=F}
+#grafico donut - Faixa etária
+
+donutplot(data_notific, 
+          incidente = "Lesão por pressão", 
+          var_principal =  "LPRES_Tipo", var_secundaria = "FAIXA_ETARIA",
+          filtro = "Em proeminências ósseas",
+          tamanho = 4, paleta = 2,
+          path_image = "lesao_pressao_faixa_etaria.png",
+          more_filtros = T)
+```
+
+\begin{figure}[H]
+\caption{Faixa etária dos pacientes com LP primária em proeminência óssea.}
+\includegraphics[width=0.7\textwidth]{Imagens/lesao_pressao_faixa_etaria.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include=F}
+#grafico donut - Sexo
+
+donutplot(data_notific, 
+          incidente = "Lesão por pressão", 
+          var_principal =  "LPRES_Tipo", var_secundaria = "SEXO",
+          filtro = "Em proeminências ósseas",
+          tamanho = 4, paleta = 2,
+          path_image = "lesao_pressao_sexo.png",
+          more_filtros = T)
+```
+
+\begin{figure}[H]
+\caption{Sexo dos pacientes com LP primária em proeminência óssea.}
+\includegraphics[width=0.7\textwidth]{Imagens/lesao_pressao_sexo.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Comprometimento tissular da LP primária em proeminência óssea
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_PO_Tissular",
+            filtro = "Em proeminências ósseas",
+            nome_coluna = "Comprometimento tissular",
+            caption = "Comprometimento tissular da LP primária em proeminência óssea")
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Comprometimento tissular da LP primária em proeminência óssea
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_PO_Loc",
+            filtro = "Em proeminências ósseas",
+            nome_coluna = "PO - Localização da lesão",
+            caption = "Localização da LP primária em proeminência óssea")
+
+```
+
+
+\subsubsection{Lesão por Pressão relacionada ao dispositivo médico}
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Comprometimento tissular da LP relacionada ao dispositivo médico
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_DM_Tissular",
+            filtro = "Relacionada a dispositivo médico",
+            nome_coluna = "Comprometimento tissular",
+            caption = "Comprometimento tissular da LP relacionada ao dispositivo médico")
+
+```
+
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Localização da LP relacionada ao dispositivo médico
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_DM_Loc",
+            filtro = "Relacionada a dispositivo médico",
+            nome_coluna = "DM - Localização da lesão.",
+            caption = "Localização da LP relacionada ao dispositivo médico")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Dispositivo médico relacionado a LP
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão por pressão",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPRES_DM_DispMed",
+            filtro = "Relacionada a dispositivo médico",
+            nome_coluna = "Dispositivo",
+            caption = "Dispositivo médico relacionado a LP")
+
+```
+
+     
+
+\subsection{Lesão Traumática}
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com o período
+
+#source("../utils.R", encoding = "UTF-8")
+
+donutplot(data_notific, 
+          incidente = "Lesão traumática", 
+          var_secundaria = "Horário do incidente",
+          tamanho = 4, paleta = 1,
+          path_image = "trauma_periodo.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Procedimento Cirúrgico.}
+\includegraphics[width=0.7\textwidth]{Imagens/trauma_periodo.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F,include=F}
+# #gráfico donut - Distribuição do gênero nas notificações em Procedimento Cirúrgico
+
+donutplot(data_notific,
+          incidente = "Lesão traumática",
+          var_secundaria = "SEXO",
+          tamanho = 4, paleta = 3,
+          path_image = "trauma_SEXO.png")
+
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Procedimento Cirúrgico.}
+\includegraphics[width=0.7\textwidth]{Imagens/trauma_SEXO.png}
+\end{figure}
+
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com a faixa etária
+
+donutplot(data_notific, 
+          incidente = "Lesão traumática", 
+          var_secundaria = "FAIXA_ETARIA",
+          tamanho = 4, paleta = 1,
+          path_image = "trauma_faixa_etaria.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição da queda de acordo com a faixa etária.}
+\includegraphics[width=0.7\textwidth]{Imagens/trauma_faixa_etaria.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Tipo de Lesão Traumática
+
+
+double_table(data_notific, 
+             incidente = "Lesão traumática", 
+             var_indica = "LTRM_Tipo",var_explica = "mes_ext", nome_coluna = "Tipo de lesão",
+             caption = "Tipo de Lesão Traumática") 
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Atividade envolvida na lesão traumática
+
+simple_table(data_notific, 
+            incidente = "Lesão traumática", 
+            coluna = "LTRM_Ativ", nome_coluna = "Atividade",
+            caption = "Atividade envolvida na lesão traumática")
+
+
+```
+
+
+\subsection{Lesão de Pele}
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com o período
+
+#source("../utils.R", encoding = "UTF-8")
+
+donutplot(data_notific, 
+          incidente = "Lesão de pele", 
+          var_secundaria = "Horário do incidente",
+          tamanho = 4, paleta = 1,
+          path_image = "pele_periodo.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição do horário do incidente em Lesão de pele}
+\includegraphics[width=0.7\textwidth]{Imagens/pele_periodo.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F,include=F}
+# #gráfico donut - Distribuição do gênero nas notificações em Procedimento Cirúrgico
+
+donutplot(data_notific,
+          incidente = "Lesão de pele",
+          var_secundaria = "SEXO",
+          tamanho = 4, paleta = 3,
+          path_image = "pele_SEXO.png")
+
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Lesão de pele}
+\includegraphics[width=0.7\textwidth]{Imagens/pele_SEXO.png}
+\end{figure}
+
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com a faixa etária
+
+donutplot(data_notific, 
+          incidente = "Lesão de pele", 
+          var_secundaria = "FAIXA_ETARIA",
+          tamanho = 4, paleta = 1,
+          path_image = "pele_faixa_etaria.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição da faixa etária em Lesão por pele}
+\includegraphics[width=0.7\textwidth]{Imagens/pele_faixa_etaria.png}
+\end{figure}
+ 
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Tipo de Lesão Traumática
+
+
+double_table(data_notific, 
+             incidente = "Lesão de pele", 
+             var_indica = "LPEL_Tipo", var_explica = "mes_ext", nome_coluna = "Tipo de lesão",
+             caption = "Tipo de Lesão de Pele") 
+
+```
+
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Comprometimento tissular da lesão por adesivo
+
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão de pele",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPEL_Tp_Adesivo",
+            filtro = "Por adesivo",
+            nome_coluna = "Tipo de Adesivo",
+            caption = "Comprometimento tissular da lesão por adesivo")
+
+```
+
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples -  Tipo de Lesão por Umidade
+
+
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão de pele",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPEL_Tp_Umidade",
+            filtro = "Por umidade",
+            nome_coluna = "Tipo",
+            caption = "Tipo de Lesão por Umidade")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples -  Comprometimento tissular da lesão por umidade
+
+
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão de pele",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPEL_Tp_Umid_Cultan",
+            filtro = "Por umidade",
+            nome_coluna = "Manifestação cutânea",
+            caption = "Comprometimento tissular da lesão por umidade")
+
+```
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples -  Localização da lesão por umidade
+
+
+
+simple_tableDoubleFilter(data_notific, 
+            incidente = "Lesão de pele",
+            var_principal =  "LPRES_Tipo", var_secundaria = "LPEL_Tp_Umid_Local",
+            filtro = "Por umidade",
+            nome_coluna = "Localização da lesão",
+            caption = "Localização da lesão por umidade")
+
+```
+
+
+
+ 
+\subsubsection{Medicamento}
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Classificação das notificações em medicamentos
+
+double_table(data_notific, 
+             incidente = "Medicamento", 
+             var_indica = "CLASSIFICA",var_explica = "mes_ext", nome_coluna = "Classificação do Incidente",
+             caption = "Classificação das notificações em medicamentos")
+
+```
+
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificações no processo de prescrição de medicamentos
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Prescrição", nome_coluna = "Prescrição",
+            caption = "Notificações no processo de prescrição de medicamentos")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificações no processo de dispensação de medicamentos
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Dispensação", nome_coluna = "Dispensação",
+            caption = "Notificações no processo de dispensação de medicamentos")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificações no processo de preparo de medicamentos
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Preparo", nome_coluna = "Dispensação",
+            caption = "Notificações no processo de preparo de medicamentos")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificação no processo de administração de medicamentos 
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Administração", nome_coluna = "Administração",
+            caption = "Notificação no processo de administração de medicamentos")
+
+```
+
+
+\subsection{Procedimento Cirúrgico}
+
+```{r, echo=F, warning=F, message=F,include=F}
+# #gráfico donut - Distribuição do gênero nas notificações em Procedimento Cirúrgico
+
+donutplot(data_notific,
+          incidente = "Procedimento cirúrgico",
+          var_secundaria = "SEXO",
+          tamanho = 4, paleta = 3,
+          path_image = "cirurg_SEXO.png")
+
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Procedimento Cirúrgico.}
+\includegraphics[width=0.7\textwidth]{Imagens/cirurg_SEXO.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Notificação de acordo com as fases do Procedimento Cirúrgico
+
+
+
+double_table(data_notific,
+             incidente = "Procedimento cirúrgico",
+             var_indica = "CRG_fase",var_explica = "mes_ext", nome_coluna = "Fase",
+             caption = "Notificação de acordo com as fases do Procedimento Cirúrgico")
+
+
+```
+ 
+ 
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Incidentes notificados da fase pós-operatória CRG_fase_pos_oper
+
+simple_table(data_notific, 
+            incidente = "Procedimento cirúrgico", 
+            coluna = "CRG_fase_pos_oper", nome_coluna = "Pós-operatória",
+            caption = "Incidentes notificados da fase pós-operatória")
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Grau de dano das notificações da fase pós-operatória 
+
+
+simple_table(data_notific, 
+            incidente = "Procedimento cirúrgico", 
+            coluna = "GRAUDANO", nome_coluna = "Grau do Dano",
+            caption = "Grau de dano das notificações da fase pós-operatória")
+```
+
+ 
+
+\subsection{Dados Gerais de Notificação}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+#grafico barra - Near miss notificados 
+
+bar_plot(data_notific,
+         classifica = "Quase um erro (Near Miss)" ,
+         path_image = "barra_erro.png")
+```
+
+\begin{figure}[H]
+\caption{Near miss notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_erro.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F, include=F}
+#grafico barra - Incidentes sem dano notificados
+
+bar_plot(data_notific,
+         classifica = "Incidente sem dano" ,
+         path_image = "barra_incidente.png")
+```
+
+\begin{figure}[H]
+\caption{Incidentes sem dano notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_incidente.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F, include=F}
+#grafico barra - Eventos Adversos Notificados
+
+bar_plot(data_notific,
+         classifica = "Evento Adverso" ,
+         path_image = "barra_evento.png")
+```
+
+\begin{figure}[H]
+\caption{Eventos Adversos Notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_evento.png}
+\end{figure}
+
+
+

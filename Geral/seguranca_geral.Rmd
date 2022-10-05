@@ -1,0 +1,881 @@
+--- 
+title: ' '
+author: ''
+date: ''
+output:
+  pdf_document:
+    fig_crop: no
+    highlight: tango
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+    includes:
+      in_header: Estilo.sty
+  html_document:
+    df_print: paged
+sansfont: Calibri Light
+classoption: a4paper
+always_allow_html: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_file = paste0(
+        'Relatório_de_segurança_alta_gestão','.pdf'
+      ),
+      envir = globalenv()
+    )
+  })
+---
+
+\rhead{\fontsize{8pt}{10pt} \selectfont Núcleo de Segurança do Paciente
+\\ \fontsize{8pt}{10pt} \selectfont Centro Nacional de Controle de Qualidade
+
+}
+
+\begin{center}
+ {\LARGE Indicadores - Segurança do Paciente, SARAH-CENTRO}
+\end{center}
+\vspace{0cm}
+
+
+```{r setup, include=FALSE, echo=FALSE, message=F}
+
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+
+pacman::p_load("knitr","tidyverse","lubridate")
+
+source("../Scripts/utils.R", encoding = "UTF-8")
+source("../Scripts/tabelas.R", encoding = "UTF-8")
+source("../Scripts/graficos.R", encoding = "UTF-8")
+
+remover_imagens()
+
+setwd("//BSBFILE01/CNCQ/Nucleo de Segurança do Paciente/Relatórios assistencia/Programas/Geral")
+
+```
+
+
+
+```{r, include=FALSE, echo=FALSE}
+
+dia = 01
+mes =  Sys.Date() %>% month()-1
+anos = Sys.Date() %>% year()
+
+
+periodo_final = paste0(anos,"-",mes,"-",dia)
+periodo_final = periodo.final(perido_final)
+periodo_final
+
+periodo_inicial = periodo.inicial(periodo_final,tipo_date = "anual")
+periodo_inicial
+
+```
+
+```{r, include=FALSE, echo=FALSE, message=F, warning=F}
+#Lendo os dados de Notificação
+data_notific = ler_excel("../Notificações.xlsx") %>% 
+  filter(str_detect(DS_LOCAL,"LN|LAGO NORTE", negate = T))
+
+```
+
+ \hspace{1cm} A Resolução da Diretoria Colegiada Nº 36, de 25 de julho de 2013, que institui as ações dos Núcleos de Segurança do Paciente (NSP) e dá outras providências, referenda em seu Artigo 7, inciso VI - compete ao NSP “implantar os Protocolos de Segurança do Paciente e realizar o monitoramento de seus indicadores”. As Portarias Nº 1377, de 9 de julho de 2013 e Nº 2095, de 24 de setembro de 2013 aprovam os protocolos prioritários e orientam a construção dos indicadores de estrutura, processo e resultado. O Hospital SARAH Centro acompanha os indicadores referentes às metas internacionais da Segurança do Paciente segundo a Organização Mundial da Saúde e outros presentes nos Protocolos da Rede SARAH.  
+
+
+\subsection{Meta 1 – Identificar o Paciente Corretamente}
+
+\subsubsection{Indicador de Estrutura}
+
+Protocolo de Identificação do Paciente implantado, atualizado e disponível para as equipes assistenciais. 
+
+\subsubsection{Indicadores de Resultado}
+
+O indicador representa todas as áreas assistenciais e de diagnóstico. 
+
+<!-- Tabela 1. Número de eventos adversos devido a falhas na identificação do paciente. -->
+```{r, echo=F, warning=F, message=F}
+
+#source("../utils.R", encoding = "UTF-8")
+data = data_notific %>%
+ filter(CLASSIFICA == "Evento Adverso")
+
+data_evento_adverso = double_table(data,
+               incidente = "Identificação do paciente",
+               var_indica = "CLASSIFICA", var_explica = "mes_ext",
+               nome_coluna = "Evento Adverso",
+               caption = "número de quedas com e sem dano", gerar_kable = F)
+
+
+kbl(data_evento_adverso,format = "latex", booktabs = TRUE, caption = "Número de eventos adversos devido a falhas na identificação do paciente, SARAH Centro") %>%
+    kable_styling(full_width = F, position = "center",latex_options = c("scale_down","HOLD_position")) %>%
+    row_spec(nrow(data_evento_adverso)-1, hline_after = T)  %>%
+    row_spec(nrow(data_evento_adverso), bold = T)
+  
+
+```
+
+O indicador representa os dados dos programas de internação
+
+```{r, echo=F, warning=F, message=F, include=F}
+pulseiras = ler_excel("../Indicadores_2021.xlsx", sheet = "PULSEIRAS_SETORES", coluna_data = "Mês") 
+
+grafico_metas(pulseiras,
+              var_indica = "Com pulseiraPulseira",
+              total = "Total pacientes",
+              path_image = "pulseiras.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Proporção de pacientes com pulseiras padronizadas entre os pacientes observados, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/pulseiras.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+criado = ler_excel("../Indicadores_2021.xlsx", sheet = "CRIADO_SETORES", coluna_data = "Mês") 
+
+grafico_metas(criado,
+              var_indica = "Criado com identificação",
+              total = "Total pacientes",
+              path_image = "criado.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Proporção de criados identificados entre os criados observados, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/criado.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 100\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+cama =ler_excel("../Indicadores_2021.xlsx", sheet = "CAMA MACA_SETORES", coluna_data = "Mês") 
+
+grafico_metas(cama,
+              var_indica =  "Cama maca com identificação",
+              total = "Total pacientes",
+              path_image = "cama.png",
+              metas = 1)
+```
+
+\begin{figure}[H]
+\caption{Proporção de cama-macas identificadas entre as cama-macas observadas, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/cama.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 100\%}
+\end{center}
+
+\newpage
+
+ \subsection{Meta 2 – Melhorar a Comunicação entre os Profissionais de Saúde}
+ 
+ \subsubsection{Indicador de Estrutura}
+ 
+Protocolo de Comunicação Segura implantado, atualizado e disponível para as equipes assistenciais. 
+Sistema de Informação Hospitalar, Prontuário Eletrônico e Sistema de Enfermarias.
+
+ 
+ \subsubsection{Indicadores de Processo}
+ 
+ Os indicadores de processo em Comunicação Segura representam a adesão ao repasse seguro de informações nas admissões e altas dos pacientes do Primeiro Estágio.
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+comunicacao = ler_excel("../Indicadores_2021.xlsx", sheet = "COMUNICAÇÃO SEGURA", coluna_data = "Mês" )
+
+grafico_metas(comunicacao,
+              var_indica = "Check list admissão",
+              total = "Total admissões",
+              path_image ="check_admissao.png",
+              metas = 0.9)
+```
+
+
+
+\begin{figure}[H]
+\caption{Percentual de preenchimento do check list de comunicação segura à admissão, 1° Estágio}
+\includegraphics[width=0.7\textwidth]{Imagens/check_admissao.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+grafico_metas(comunicacao,
+              var_indica = "Check list alta",
+              total = "Total altas",
+              path_image ="check_alta.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Percentual de preenchimento do check list de comunicação segura na alta, 1° Estágio}
+\includegraphics[width=0.7\textwidth]{Imagens/check_alta.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+
+
+ \subsection{Meta 3 – Melhorar a Segurança na Prescrição, Dispensação e Administração de Medicamentos}
+ 
+ \subsubsection{Indicador de Estrutura}
+
+Protocolo de Segurança na Prescrição, Dispensação e Administração de Medicamentos implantado, atualizado e divulgado para as equipes assistenciais. 
+
+ \subsubsection{Indicadores de Resultado}
+ 
+ Os indicadores representam as informações referentes aos programas de internação. 
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+medicamentos_dispensados_total = ler_excel("../Indicadores_2021.xlsx", sheet = "Medicamentos_prescritos", coluna_data = "Mês") 
+
+medicamentos_dispensados_erros = data_notific %>%
+  filter(PROGRAMA != "Externo")
+
+grafico_taxa(data_num = medicamentos_dispensados_erros, incidente = "Medicamento", periodo_num = "Data" ,
+             data_den = medicamentos_dispensados_total , var_den = "Prescritos", periodo_den = "Data" ,
+             var_base = "MED_Prescrição",
+             more_filtros = F,
+             var_extra = "", filtro_extra = "",
+             y_max = 30,
+             path_image = "med_prescritos.png", vetor_metas = c(1,-1))
+
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de erros na prescrição de medicamentos, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/med_prescritos.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: máximo aceitavel de 1\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+medicamentos_dispensados_total = ler_excel("../Indicadores_2021.xlsx", sheet = "Medicamentos_dispensados", coluna_data = "Mês") 
+
+medicamentos_dispensados_erros = data_notific %>%
+  filter(PROGRAMA != "Externo")
+
+
+grafico_taxa(data_num = medicamentos_dispensados_erros, incidente = "Medicamento", periodo_num = "Data" ,
+             data_den = medicamentos_dispensados_total , var_den = "Dispensados", periodo_den = "Data" ,
+             var_base = "MED_Dispensação",
+             more_filtros = F,
+             var_extra = "", filtro_extra = "",
+             y_max = 30,
+             path_image = "med_dispensados.png", vetor_metas = c(1,-1))
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de erros na dispensação de medicamentos, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/med_dispensados.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: máximo aceitavel de 1\%}
+\end{center}
+
+
+
+\subsection{Meta 4 – Assegurar a cirurgia em local de intervenção, procedimento e paciente corretos}
+ 
+ \subsubsection{PROTOCOLO DE CIRURGIA SEGURA}
+
+
+\textbf{INDICADORES DE ESTRUTURA}
+
+ Protocolo de Cirurgia Segura implantado, atualizado e divulgado para as equipes assistenciais.
+
+ \hspace{1cm}  O Protocolo de Cirurgia Segura integra as recomendações da RDC nº 36 de 25 de Julho de 2013 e compõe o Anexo 2 da Portaria nº 1.377 de 24 de julho de 2013. As medidas propostas objetivam a redução de incidentes e eventos adversos, além de assegurar a realização de procedimentos cirúrgicos no local e no paciente correto.
+
+ \hspace{1cm}  Os indicadores em destaque no Plano de Segurança do Paciente da Rede SARAH para este protocolo são:
+
+\textbf{INDICADORES DE RESULTADO}
+
+ 
+```{r, warning=F, message=F, echo=F}
+
+data = gerar_data_nulo(c("Evento Adverso" ), c("var_indica",meses_anos(mes, anos))) %>% 
+   adorn_totals(c("col","row"))
+
+colnames(data)[1] = ""
+
+table_generator(data, caption = "Número de cirurgias em paciente errado, programas de internação",
+                latex_options = c("HOLD_position", "scale_down"))
+
+```
+
+
+```{r, warning=F, message=F, echo=F}
+
+data = gerar_data_nulo(c("Evento Adverso" ), c("var_indica",meses_anos(mes, anos))) %>% 
+   adorn_totals(c("col","row"))
+
+colnames(data)[1] = ""
+
+table_generator(data, caption = "Número de cirurgias em local errado, programas de internação", 
+                latex_options = c("HOLD_position", "scale_down") )
+
+```
+
+
+
+```{r, warning=F, message=F, echo=F}
+
+data = gerar_data_nulo(c("Evento Adverso" ), c("var_indica",meses_anos(mes, anos))) %>% 
+   adorn_totals(c("col","row"))
+
+colnames(data)[1] = ""
+
+table_generator(data, caption = "Número de procedimentos cirúrgicos errados, programas de internação",
+                latex_options = c("HOLD_position", "scale_down"))
+
+```
+
+
+\textbf{INDICADOR DE PROCESSO}
+
+ \hspace{1cm}  As melhores práticas recomendam o uso de da Lista de Verificação da Cirurgia Segura. Esta deve ser aplicada por um único condutor, nos seguintes momentos do ato operatório: 1) antes da indução anestésica; 2) antes da incisão cirúrgica e, 3) antes do paciente sair da sala de cirurgia. O indicador proposto pelo Plano de Segurança da Rede SARAH para o monitoramento desta atividade está representado abaixo:
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+data = ler_excel("../Indicadores_2021.xlsx", sheet = "Lista de Verificação", coluna_data = "Mês")
+
+grafico_metas(data,
+              var_indica =  "LVSC completamente preenchidas",
+              total = "Total de cirurgias avaliadas",
+              path_image = "lista_verificacao_centro_cirurgico.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Taxa de adesão à Lista de Verificação da Cirurgia Segura}
+\includegraphics[width=0.7\textwidth]{Imagens/lista_verificacao_centro_cirurgico.png}
+\end{figure}
+
+
+
+\begin{center}
+ \textbf{Meta: 95\%}
+\end{center}
+
+
+
+\subsection{PROTOCOLO DE PREVENÇÃO DE INFECÇÃO DO SÍTIO CIRÚRGICO}
+
+ \hspace{1cm}  O Protocolo de Prevenção de Infecção Relacionada à Assistência (IRAS) integra as recomendações da RDC nº 36 de 25 de Julho de 2013 sendo a Prevenção da Infecção do Sítio Cirúrgico (ICS) uma das circunstâncias elegíveis. O monitoramento deste Protocolo se dará mediante o acompanhamento dos seguintes indicadores: 
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+data = ler_excel("../Indicadores_2021.xlsx",sheet = "Profilaxia 30-60min", coluna_data = "Mês")
+
+grafico_metas(data,
+              var_indica =  "Cirurgias com profilaxia 30-60 min antes da incisão",
+              total = "Total de cirurgias com atb",
+              path_image = "profilaxia30-60_centro_cirurgico.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Taxa de antibiótico profilático administrado 30 a 60 minutos antes da incisão}
+\includegraphics[width=0.7\textwidth]{Imagens/profilaxia30-60_centro_cirurgico.png}
+\end{figure}
+
+
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+data = ler_excel("../Indicadores_2021.xlsx",sheet = "Profilaxia até 24h", coluna_data = "Mês")
+
+
+grafico_metas(data,
+              var_indica =  "Cirurgias com atb em até 24h",
+              total = "Total de cirurgias com atb",
+              path_image = "profilaxia_ate_24h_centro_cirurgico.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Taxa de duração do antibiótico profilático em até 24 horas}
+\includegraphics[width=0.7\textwidth]{Imagens/profilaxia_ate_24h_centro_cirurgico.png}
+\end{figure}
+
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+data = ler_excel("../Indicadores_2021.xlsx", sheet = "Tricotomia", coluna_data = "Mês")
+
+grafico_metas(data,
+              var_indica =  "Cirurgias que realizam tricotomia com intervalo de até 2h",
+              total = "Total de cirurgias com indicação de tricotomia",
+              path_image = "tricotomia_centro_cirurgico.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Taxa tricotomia com intervalo menor ou igual a 2h}
+\includegraphics[width=0.7\textwidth]{Imagens/tricotomia_centro_cirurgico.png}
+\end{figure}
+
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+
+\newpage
+
+
+\subsection{PROTOCOLO DE PREVENÇÃO DE LESÃO POR PRESSÃO}
+
+
+ \hspace{1cm} O Protocolo de Prevenção de Lesão por Pressão compõe a RCD nº 36 de julho de 2013 estando as ações descritas no anexo 1 da Portaria nº 1.377 de 9 de julho 2013 / Ministério da Saúde. As recomendações envolvem a estratificação do risco para lesões por pressão à admissão e adoção de medidas preventivas conforme o risco. O monitoramento deste protocolo se fará mediante o acompanhamento dos seguintes indicadores:
+ 
+
+```{r, echo=F, warning=F, message=F ,include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+
+taxa_lesao_pressao = ler_excel("../Indicadores_2021.xlsx", sheet = "TAXA_LP SETORES", coluna_data = "Mês") 
+
+centro_cirurgico = data_notific
+
+grafico_taxa(data_num = centro_cirurgico, incidente = "Lesão por pressão", periodo_num = "Data" ,
+             data_den = taxa_lesao_pressao , var_den = "Total de pacientes internados", periodo_den = "Data" ,
+             more_filtros = T,
+             var_extra = "LPRES_Tipo", filtro_extra = "Em proeminências ósseas", 
+             path_image = "lesao_pressao_centro_cirurgico.png", vetor_metas = c(1,-1))
+
+```
+
+
+\begin{figure}[H]
+\caption{Percentual de pacientes com tempo de posicionamento cirúrgico até 3h e que desenvolveram Lesão por Pressão}
+\includegraphics[width=0.7\textwidth]{Imagens/lesao_pressao_centro_cirurgico.png}
+\end{figure}
+
+ 
+
+\newpage
+\subsection{Meta 5 -  Higienizar as mãos para evitar infecções}
+
+ \subsubsection{Indicador de Estrutura}
+ 
+ Protocolo de Higienização das Mãos implantado, atualizado e divulgado para as equipes assistenciais.
+ 
+ \subsubsection{Indicadores de Resultado}
+ 
+ O indicador representa os dados dos programas de internação. 
+ 
+
+```{r, echo=F, warning=F, message=F}
+
+indicadores = ler_excel("../Indicadores_2021.xlsx", sheet = "Higienização das mãos", coluna_data = "Mês") %>% 
+  filter(Programa == "Geral")
+```
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+grafico_linhas(indicadores, 
+               variavel = "Taxa",
+               path_image = "higienizacao.png", 
+               metas = 20)
+
+```
+
+\begin{figure}[H]
+\caption{Consumo de preparação alcoólica (ml) por paciente-dia, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/higienizacao.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 20 ml por paciente-dia}
+\end{center}
+
+
+\subsection{Meta 6 – Reduzir o Risco de Quedas}
+
+ \subsubsection{Indicador de Estrutura}
+ 
+ Protocolo de Prevenção de Quedas implantado, atualizado e divulgado para as equipes assistenciais. 
+ 
+ \subsubsection{Indicadores de Processo}
+ 
+ O indicador representa os dados dos programas de Neurorreabilitação e Ortopedia Infantil, Neurocirurgia/Oncologia, Ortopedia Adulto e Reabilitação Neurológica. 
+ 
+ 
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+risco = ler_excel("../Indicadores_2021.xlsx", sheet = "RISCO QUEDA_SETORES", coluna_data = "Mês") 
+
+ 
+grafico_metas(risco,
+              var_indica = "Pacientes avaliados",
+              total = "Internados",
+              path_image ="riscos.png",
+              metas = 0.9 )
+```
+
+
+\begin{figure}[H]
+\caption{Proporção de pacientes submetidos à avaliação do risco de queda à admissão}
+\includegraphics[width=0.7\textwidth]{Imagens/riscos.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+ \subsubsection{Indicadores de Resultado}
+ 
+
+```{r, echo=F, warning=F, message=F, include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")
+
+quedas = data_notific  
+
+grafico_taxa(data_num = quedas, incidente = "Queda", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = F,
+             divisor = 1000,
+             var_extra = "", filtro_extra = "",
+             path_image = "quedas_pacientes_dia.png", vetor_metas = c(-1.5,-3.5))
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de quedas por mil pacientes-dia, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/quedas_pacientes_dia.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")
+
+quedas = data_notific 
+#source("../utils.R", encoding = "UTF-8")
+grafico_taxa(data_num = quedas, incidente = "Queda", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = T,
+             divisor = 1000,
+             var_extra = "CLASSIFICA", filtro_extra = "Evento Adverso",
+             path_image = "queda_pacientes_dia.png", vetor_metas = c(-0.5,-1))
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de quedas com dano por mil pacientes-dia, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_pacientes_dia.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, results="asis", include=T}
+
+data = data_notific %>% filter(PROGRAMA != "Externo")
+
+tabela_queda = double_table(data,
+             incidente = "Queda",
+             var_indica = "CLASSIFICA", var_explica = "ano_mes",
+             caption = "", gerar_kable = F)
+
+
+
+quedas = data_quedas(tabela_queda, mes, anos, caption = "Distribuição do número de quedas, programas de internação")
+
+quedas
+
+```
+
+
+
+```{r, echo=F, warning=T, message=F, results="asis", include=T}
+
+#source("../tabelas.R", encoding = "UTF-8")
+dataExterno = data_notific  %>% filter(PROGRAMA == "Externo")  
+
+tabela_quedaExterno = double_table(dataExterno,
+             incidente = "Queda",
+             var_indica = "CLASSIFICA", var_explica = "ano_mes",
+             caption = "", gerar_kable = F)
+
+
+
+quedasExterno = data_quedas(tabela_quedaExterno, mes, anos, caption = "Distribuição do número de quedas, demais setores")
+quedasExterno
+
+
+```
+
+
+\subsection{Meta 7 – Prevenir Lesões por Pressão (LPP)}
+
+ \subsubsection{Indicador de Estrutura}
+ 
+ Protocolo de Prevenção de Lesão por Pressão implantado, atualizado e divulgado para as equipes assistenciais. 
+ 
+ \subsubsection{Indicadores de Processo}
+ 
+ O indicador representa os dados dos programas de Neurorreabilitação e Ortopedia Infantil, Neurocirurgia/Oncologia, Ortopedia Adulto e Reabilitação Neurológica. 
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+lesao_pressao = ler_excel("../Indicadores_2021.xlsx", sheet = "RISCO LP_PLANO_SETORES", coluna_data = "Mês") %>% 
+  filter(Programa != "Lesão Medular")
+
+grafico_metas(lesao_pressao,
+              var_indica = "avaliado admissão",
+              total = "Internações",
+              path_image ="lesao_pressao.png",
+              metas = 0.9)
+```
+
+
+\begin{figure}[H]
+\caption{Percentual de pacientes submetidos à avaliação do risco de LPP à admissão}
+\includegraphics[width=0.7\textwidth]{Imagens/lesao_pressao.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+<!-- Os indicadores representam os dados do Programa de Primeiro Estágio. -->
+
+<!-- Figura 13. Percentual de pacientes recebendo cuidado preventivo apropriado -->
+<!-- Figura 14. Percentual de pacientes recebendo avaliação diária do risco para LPP -->
+
+
+O indicador a seguir representa os dados dos programas de internação. 
+
+```{r, echo=F, warning=F, message=F, include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")
+
+lesao = data_notific 
+
+grafico_taxa(data_num = lesao, incidente = "Lesão por pressão", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = T,
+             divisor = 1000,
+             var_extra  = "LPRES_Tipo", filtro_extra = "Em proeminências ósseas",
+             path_image = "lesaoPressao_pacientes_dia.png", vetor_metas = c(-1,-1))
+
+
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de Lesão por Pressão por mil pacientes-dia, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/lesaoPressao_pacientes_dia.png}
+\end{figure}
+
+\newpage
+
+\subsection{Outros indicadores}
+
+
+
+ \subsubsection{Indicadores de Processo}
+ 
+ Os indicadores representam os dados dos programas de internação.
+ 
+```{r, include=F, echo=F}
+
+nutricional = ler_excel("../TerapiaNutricional2021.xlsx", sheet = "Indicadores_R", coluna_data = "Mês") %>% 
+    filter(ano == anos) 
+
+```
+
+```{r, echo=F, warning=F, message=F, include=F}
+indicadores = ler_excel("../Indicadores_2021.xlsx", sheet = "Triagem_RISCO NUT", coluna_data = "Mês") 
+
+grafico_metas(indicadores,
+              var_indica =  "Triagem nutricional do risco à admissão",
+              total = "Total de pacientes admitidos",
+              possui_meta = F,
+              path_image = "triados.png")
+```
+
+\begin{figure}[H]
+\caption{Taxa de pacientes triados quanto ao risco nutricional na admissão, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/triados.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+grafico_metas(indicadores,
+              var_indica = "Pacientes com défict/risco nutricional",
+              total = "Pacientes avaliados",
+              possui_meta = F,
+              path_image = "prevalencia.png")
+```
+
+\begin{figure}[H]
+\caption{Prevalência de pacientes admitidos com déficit/risco nutricional *, programas de internação}
+\includegraphics[width=0.7\textwidth]{Imagens/prevalencia.png}
+\end{figure}
+
+\newpage
+
+ \subsubsection{Indicadores de Resultado}
+
+```{r, echo=F, warning=F, message=F}
+#source("../utils.R", encoding = "UTF-8")
+
+tabela_taxas(nutricional,
+             var1 = "Notificações de retirada acidental e obstrução",
+             var2 = "Dias com Cateter Nasoentérico",
+             caption = "Incidência de Perda do CNE nos pacientes em TNE, programas de internação")
+
+tabela_taxas(nutricional,
+             var1 ="Não conformidades no processo de TNE",
+             var2 ="Dias em uso de TNE",
+             caption = "Taxa de não conformidade no processo de TNE, programas de internação")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes em TNE com diarreia",
+             var2 ="Pacientes em uso TNE",
+             caption = "Taxa de pacientes com diarréia recebendo TNE, programas de internação")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes em TNE com Jejum >24h",
+             var2 ="Pacientes em uso TNE",
+             caption = "Frequência de jejum >48h em pacientes com TNE, programas de internação")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes com volume de TNE>70%",
+             var2 ="Pacientes em uso TNE",
+             caption = "Percentual de pacientes recebendo volume de NE > 70\\% do prescrito, programas de internação") 
+
+  
+```
+
+
+\newpage
+
+ \subsection{Notificação de Incidentes}
+
+ O dado reflete todas as notificações realizadas pelas equipes assistenciais e de diagnóstico. 
+
+```{r, echo=F, warning=F, message=F,results = "asis"}
+#source("../utils.R", encoding = "UTF-8")
+
+data = data_notific 
+
+
+tables = multiple_tables(data, var_indica = 'Tipo_incidente', var_explica = "CLASSIFICA")
+
+captions = c('Notificações de Evento Adverso, programa de internação',
+             'Notificações de Incidente sem dano, programa de internação',
+             'Notificações de Quase um erro (Near Miss), programa de internação')
+
+
+for(x in 1:length(captions)) print(table_generator(tables[[x]],captions[x], 
+                                                   latex_options = c("HOLD_position", "scale_down")))
+
+```
+
+```{r, echo=T, warning=F, message=F,results = "asis", include=F}
+#source("../graficos.R", encoding = "UTF-8")
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês") %>% 
+  filter((Data >= periodo_inicial) & (Data <= periodo_final))
+
+data = taxa_eventos_adversos(data_den = paciente_dia, var_den = "Paciente/dia", path_image = "taxa_adverso_pdia.png" )
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de eventos adversos por paciente-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/taxa_adverso_pdia.png}
+\end{figure}
+
+
+```{r, echo=T, warning=F, message=F,results = "asis", include=F}
+#source("../graficos.R", encoding = "UTF-8")
+
+paciente_inter = ler_excel("../Indicadores_2021.xlsx", sheet = "RISCO LP_PLANO_SETORES", coluna_data = "Mês") %>% 
+  filter((Data >= periodo_inicial) & (Data <= periodo_final))
+
+data = taxa_eventos_adversos(data_den = paciente_inter, var_den = "Internações", path_image = "taxa_adverso_pinter.png" )
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de eventos adversos por pacientes internados}
+\includegraphics[width=0.7\textwidth]{Imagens/taxa_adverso_pinter.png}
+\end{figure}
+
+
+```{r, echo=T, warning=F, message=F,results = "asis", include=F}
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês") %>%
+  filter((Data >= periodo_inicial) & (Data <= periodo_final))
+
+data = taxa_incidentes_semdano(data_den = paciente_dia, var_den = "Paciente/dia", path_image = "taxa_incidentes_semdano_pdia.png" )
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de incidentes sem dano por paciente-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/taxa_incidentes_semdano_pdia.png}
+\end{figure}
+
+
+```{r, echo=T, warning=F, message=F,results = "asis", include=F }
+#source("../graficos.R", encoding = "UTF-8")
+
+paciente_inter = ler_excel("../Indicadores_2021.xlsx", sheet = "RISCO LP_PLANO_SETORES", coluna_data = "Mês") %>% 
+  filter((Data >= periodo_inicial) & (Data <= periodo_final))
+
+taxa_incidentes_semdano(data_den = paciente_inter, var_den = "Internações", path_image = "taxa_incidentes_semdano_pinter.png" )
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de incidentes sem dano por pacientes internados}
+\includegraphics[width=0.7\textwidth]{Imagens/taxa_incidentes_semdano_pinter.png}
+\end{figure}

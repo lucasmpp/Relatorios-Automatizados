@@ -1,0 +1,41 @@
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage[default]{sourcesanspro}
+\usepackage{tikz}
+\addtolength{\headheight}{1.0cm} 
+\fancypagestyle{plain}{} 
+\thispagestyle{fancy} 
+\renewcommand{\headrulewidth}{0pt}
+
+% Package for references with numbers
+\bibliographystyle{apsrev4-1}
+\usepackage[numbers]{natbib}
+\setcitestyle{numbers}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{titling}
+
+\usepackage{background}
+
+\backgroundsetup{
+position={3,0.55},
+scale=1.2,
+color=black,
+opacity=1,
+angle=0,
+pages=all,
+contents={%
+  \includegraphics[width=200px,height=200px]{Imagens/logo_header.jpg}
+  }%
+}
+\usepackage{floatrow}
+\floatsetup[figure]{capposition=top}
+\floatsetup[table]{capposition=top}
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% center of header
+\fancyhf{} % clear all header and footer fields
+
+\renewcommand{\headrulewidth}{0pt}

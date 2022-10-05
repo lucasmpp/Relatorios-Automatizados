@@ -1,0 +1,351 @@
+--- 
+title: ' '
+author: ''
+date: ''
+output:
+  pdf_document:
+    fig_crop: no
+    highlight: tango
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+    includes:
+      in_header: Estilo.sty
+  html_document:
+    df_print: paged
+  word_document: default
+sansfont: Calibri Light
+classoption: a4paper
+always_allow_html: yes
+---
+
+\rhead{\fontsize{8pt}{10pt} \selectfont Núcleo de Segurança do Paciente
+\\ \fontsize{8pt}{10pt} \selectfont Centro Nacional de Controle de Qualidade
+\\ \fontsize{8pt}{10pt} \selectfont 1°Estágio – Relatório de Notificações
+}
+
+
+
+```{r setup, include=FALSE, echo=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+  
+pacman::p_load("knitr","tidyverse","lubridate","janitor","kableExtra","png")
+
+
+setwd("//BSBFILE01/CNCQ/Nucleo de Segurança do Paciente/Relatórios assistencia/Programas/1º Estágio")
+
+
+source("../Scripts/utils.R", encoding = "UTF-8")
+source("../Scripts/tabelas.R", encoding = "UTF-8")
+source("../Scripts/graficos.R", encoding = "UTF-8")
+
+remover_imagens()
+
+#define o programa
+programa = "1º Estágio"
+```
+
+
+
+```{r, include=FALSE, echo=FALSE}
+dia = 01
+mes = Sys.Date() %>% month()-1
+anos = Sys.Date() %>% year()
+
+
+periodo_final = paste0(anos,"-",mes,"-",dia)
+periodo_final = periodo.final(perido_final)
+periodo_final
+
+periodo_inicial = periodo.inicial(periodo_final,tipo_date = "anual")
+periodo_inicial
+
+```
+
+
+
+
+\section{NOTIFICAÇÕES – Ano 2021, 1º Estágio}
+
+\subsection{Queda}
+```{r, echo=F, warning=F, message=F}
+
+data_notific = ler_excel("../Notificações.xlsx") %>% 
+                filter(PROGRAMA == programa)
+
+```
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Classificação da queda de acordo com o dano mês a mês 
+
+double_table(data_notific, 
+             incidente = "Queda", 
+             var_indica = "CLASSIFICA",var_explica = "mes_ext", nome_coluna = "Classificação do Incidente",
+             caption = "Distribuição das quedas mês a mês de acordo com o dano.") 
+
+```
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Distribuição da queda de acordo com o período
+
+donutplot(data_notific, 
+          incidente = "Queda", 
+          var_secundaria = "Horário do incidente",
+          tamanho = 4, paleta = 1,
+          path_image = "queda_periodo.png")
+```
+
+\begin{figure}[H]
+\caption{Distribuição da queda de acordo com o período.}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_periodo.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, results="asis"}
+#tabela simples - Motivo da queda
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Motivo", nome_coluna = "Motivo da Queda",
+            caption = "Motivo da queda.")
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Atividade durante a queda 
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Atividade", nome_coluna = "Atividade",
+            caption = "Atividade durante a queda.")
+```
+
+
+
+\newpage
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Superfície envolvida na queda 
+
+simple_table(data_notific, 
+            incidente = "Queda", 
+            coluna = "QUED_Superficie", nome_coluna = "Superfície",
+            caption = "Superfície envolvida na queda.")
+
+```
+
+
+```{r, echo=F, warning=F, message=F, results="asis",include = F}
+#grafico donut - Presença de acompanhante no momento da queda
+
+donutplot(data_notific, 
+          incidente = "Queda", 
+          var_secundaria = "QUED_Acomp",
+          tamanho = 4, paleta = 2,
+          path_image = "queda_acomp.png")
+```
+
+\begin{figure}[H]
+\caption{Presença de acompanhante no momento da queda.}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_acomp.png}
+\end{figure}
+
+ \newpage
+
+\subsection{Lesão por Pressão (LP)}
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Tipo de Lesão por Pressão 
+
+double_table(data_notific, 
+             incidente = "Lesão por pressão", 
+             var_indica = "LPRES_Tipo",var_explica = "mes_ext", nome_coluna = "Tipo de lesão",
+             caption = "Tipo de Lesão por Pressão.") 
+
+```
+
+
+\subsubsection{Lesão por Pressão em Proeminência Óssea}
+
+ \hspace{1cm} Em 2020 houve uma LP estágio 1, no ísquio em paciente do gênero masculino. A outra foi estágio 2, no pavilhão auditivo em paciente do gênero feminino; ambas primárias.
+
+
+\subsubsection{Lesão por Pressão Relacionada ao Dispositivo Médico}
+
+ \hspace{1cm} Em 2020, houve nove LP relacionadas ao Dispositivo Médico; o comprometimento tissular está ilustrado abaixo: 
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Comprometimento tissular na LP por dispositivo médico
+
+simple_table(data_notific, 
+            incidente = "Lesão por pressão", 
+            coluna = "LPRES_DM_Tissular", nome_coluna = "Comprometimento Tissular",
+            caption = "Comprometimento tissular na LP por dispositivo médico.")
+
+```
+
+
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Localização da LP por dispositivo médico
+
+simple_table(data_notific, 
+            incidente = "Lesão por pressão", 
+            coluna = "LPRES_DM_Loc", nome_coluna = "Localização da LP",
+            caption = "Localização da LP por dispositivo médico.")
+```
+
+\subsection{Lesão Traumática}
+
+ \hspace{1cm} Em 2020 foi notificada uma lesão traumática do tipo abrasão relacionada à procedimento cirúrgico. 
+
+\subsection{Lesão de Pele}
+
+
+ \hspace{1cm} Em 2020, foi notificada apenas duas lesões por adesivo, uma delas com formação de flictena e outra com lesão de continuidade. 
+
+\subsubsection{Medicamento}
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Classificação das notificações em medicamentos
+
+double_table(data_notific, 
+             incidente = "Medicamento", 
+             var_indica = "CLASSIFICA",var_explica = "mes_ext", nome_coluna = "Classificação do Incidente",
+             caption = "Classificação das notificações em medicamentos.")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificações no processo de prescrição de medicamentos
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Prescrição", nome_coluna = "Prescrição",
+            caption = "Notificações no processo de prescrição de medicamentos.")
+
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificações no processo de dispensação de medicamentos
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Dispensação", nome_coluna = "Dispensação",
+            caption = "Notificações no processo de dispensação de medicamentos.")
+
+```
+
+ \hspace{1cm} Não houve notificações de falhas na fase do preparo de medicamentos no ano de 2020. 
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Notificação no processo de administração de medicamentos 
+
+simple_table(data_notific, 
+            incidente = "Medicamento", 
+            coluna = "MED_Administração", nome_coluna = "Administração",
+            caption = "Notificação no processo de administração de medicamentos.")
+
+```
+
+
+\subsection{Procedimento Cirúrgico}
+
+```{r, echo=F, warning=F, message=F,include=F}
+# #gráfico donut - Distribuição do gênero nas notificações em Procedimento Cirúrgico
+
+donutplot(data_notific,
+          incidente = "Procedimento cirúrgico",
+          var_secundaria = "SEXO",
+          tamanho = 4, paleta = 3,
+          path_image = "cirurg_SEXO.png")
+
+```
+
+\begin{figure}[H]
+\caption{Distribuição do gênero nas notificações em Procedimento Cirúrgico.}
+\includegraphics[width=0.7\textwidth]{Imagens/cirurg_SEXO.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F}
+#tabela dupla - Notificação de acordo com as fases do Procedimento Cirúrgico
+
+double_table(data_notific,
+             incidente = "Procedimento cirúrgico",
+             var_indica = "CRG_fase",var_explica = "mes_ext", nome_coluna = "Fase",
+             caption = "Notificação de acordo com as fases do Procedimento Cirúrgico.")
+
+
+```
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Incidentes notificados da fase pós-operatória CRG_fase_pos_oper
+
+simple_table(data_notific, 
+            incidente = "Procedimento cirúrgico", 
+            coluna = "CRG_fase_pos_oper", nome_coluna = "Pós-operatória",
+            caption = "Incidentes notificados da fase pós-operatória.")
+```
+
+
+```{r, echo=F, warning=F, message=F}
+#tabela simples - Grau de dano das notificações da fase pós-operatória 
+
+
+simple_table(data_notific, 
+            incidente = "Procedimento cirúrgico", 
+            coluna = "GRAUDANO", nome_coluna = "Grau do Dano",
+            caption = "Grau de dano das notificações da fase pós-operatória.")
+```
+
+\subsection{Dados Gerais de Notificação}
+
+
+```{r, echo=F, warning=F, message=F,include = F}
+#grafico barra - Near miss notificados 
+
+bar_plot(data_notific,
+         classifica = "Quase um erro (Near Miss)" ,
+         path_image = "barra_erro.png")
+```
+
+\begin{figure}[H]
+\caption{Near miss notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_erro.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F,include = F}
+#grafico barra - Incidentes sem dano notificados
+
+bar_plot(data_notific,
+         classifica = "Incidente sem dano" ,
+         path_image = "barra_incidente.png")
+```
+
+\begin{figure}[H]
+\caption{Incidentes sem dano notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_incidente.png}
+\end{figure}
+
+```{r, echo=F, warning=F, message=F,include = F}
+#grafico barra - Eventos Adversos Notificados
+
+bar_plot(data_notific,
+         classifica = "Evento Adverso" ,
+         path_image = "barra_evento.png")
+```
+
+\begin{figure}[H]
+\caption{Eventos Adversos Notificados.}
+\includegraphics[width=0.7\textwidth]{Imagens/barra_evento.png}
+\end{figure}
+
+
+
+
+

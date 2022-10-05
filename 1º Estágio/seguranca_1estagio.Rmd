@@ -1,0 +1,518 @@
+--- 
+title: ' '
+author: ''
+date: ''
+output:
+  pdf_document:
+    fig_crop: no
+    highlight: tango
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+    includes:
+      in_header: Estilo.sty
+  html_document:
+    df_print: paged
+  word_document: default
+sansfont: Calibri Light
+classoption: a4paper
+always_allow_html: yes
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_file = paste0(
+        'Relatório_de_segurança_1°estágio','.pdf'
+      ),
+      envir = globalenv()
+    )
+  })
+---
+
+\rhead{\fontsize{8pt}{10pt} \selectfont Núcleo de Segurança do Paciente
+\\ \fontsize{8pt}{10pt} \selectfont Centro Nacional de Controle de Qualidade
+
+}
+
+\begin{center}
+ {\LARGE Programa Primeiro Estágio}
+\end{center}
+\vspace{0cm}
+
+
+```{r setup, include=FALSE, echo=FALSE}
+# tinytex::install_tinytex()
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen=999)
+
+pacman::p_load("knitr","tidyverse","lubridate","xcolor","janitor","kableExtra")
+
+source("../Scripts/utils.R", encoding = "UTF-8")
+source("../Scripts/tabelas.R", encoding = "UTF-8")
+source("../Scripts/graficos.R", encoding = "UTF-8")
+
+
+setwd("//BSBFILE01/CNCQ/Nucleo de Segurança do Paciente/Relatórios assistencia/Programas/1º Estágio")
+
+remover_imagens()
+
+programa = "1º Estágio"
+```
+
+
+```{r, include=FALSE, echo=FALSE}
+
+dia = 01
+mes =  Sys.Date() %>% month()-1
+anos = Sys.Date() %>% year()
+
+
+periodo_final = paste0(anos,"-",mes,"-",dia)
+periodo_final = periodo.final(perido_final)
+periodo_final
+
+periodo_inicial = periodo.inicial(periodo_final,tipo_date = "anual")
+periodo_final
+
+```
+
+```{r, include=FALSE, echo=FALSE, message=F, warning=F}
+#Lendo os dados de Notificação
+data_notific = ler_excel("../Notificações.xlsx") %>% 
+  filter(PROGRAMA == programa)
+
+```
+
+\subsection{PROTOCOLO DE IDENTIFICAÇÃO DO PACIENTE}
+
+```{r, echo=F, warning=F, message=F, include=F}
+pulseiras =ler_excel("../Indicadores_2021.xlsx", sheet = "PULSEIRAS_SETORES", coluna_data = "Mês") %>% 
+  filter(Programa == programa)
+
+grafico_metas(pulseiras,
+              var_indica =  "Com pulseiraPulseira",
+              total = "Total pacientes",
+              path_image = "pulseiras.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Percentual de pacientes com pulseiras padronizadas entre os pacientes avaliados}
+\includegraphics[width=0.7\textwidth]{Imagens/pulseiras.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+criado = ler_excel("../Indicadores_2021.xlsx", sheet = "CRIADO_SETORES", coluna_data = "Mês") %>% 
+  filter(Programa == programa)
+
+grafico_metas(criado,
+              var_indica = "Criado com identificação",
+              total = "Total pacientes",
+              path_image = "criado.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Proporção de criados identificados entre os criados observados}
+\includegraphics[width=0.7\textwidth]{Imagens/criado.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 100\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+cama =ler_excel("../Indicadores_2021.xlsx", sheet = "CAMA MACA_SETORES", coluna_data = "Mês") %>% 
+  filter(Programa == programa)
+
+grafico_metas(cama,
+              var_indica =  "Cama maca com identificação",
+              total = "Total pacientes",
+              path_image = "cama.png",
+              metas = 1)
+```
+
+\begin{figure}[H]
+\caption{Proporção de cama-macas identificadas entre as cama-macas observadas}
+\includegraphics[width=0.7\textwidth]{Imagens/cama.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 100\%}
+\end{center}
+
+ \subsection{COMUNICAÇÃO SEGURA}
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+comunicacao = ler_excel("../Indicadores_2021.xlsx", sheet = "COMUNICAÇÃO SEGURA", coluna_data = "Mês" )
+
+grafico_metas(comunicacao,
+              var_indica = "Check list admissão",
+              total = "Total admissões",
+              path_image ="check_admissao.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Percentual de preenchimento do check list de comunicação segura à admissão}
+\includegraphics[width=0.7\textwidth]{Imagens/check_admissao.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+ 
+```{r, echo=F, warning=F, message=F, include=F}
+
+grafico_metas(comunicacao,
+              var_indica = "Check list alta",
+              total = "Total altas",
+              path_image ="check_alta.png",
+              metas = 0.9)
+```
+
+\begin{figure}[H]
+\caption{Percentual de preenchimento do check list de comunicação segura na alta}
+\includegraphics[width=0.7\textwidth]{Imagens/check_alta.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+\newpage
+
+ \subsection{PROTOCOLO DE SEGURANÇA NO USO DE MEDICAMENTOS}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+medicamentos_prescritos_total = ler_excel("../Indicadores_2021.xlsx", sheet = "Medicamentos_prescritos", coluna_data = "Mês")%>% 
+  filter(Programa == programa) 
+
+medicamentos_prescritos_erros = data_notific 
+
+
+#source("../utils.R", encoding = "UTF-8")
+grafico_taxa(data_num = medicamentos_prescritos_erros, incidente = "Medicamento", periodo_num = "Data" ,
+             data_den = medicamentos_prescritos_total , var_den = "Prescritos", periodo_den = "Data" ,
+             var_base = "MED_Prescrição",
+             more_filtros = F,
+             var_extra = "", filtro_extra = "",
+             y_max = 30,
+             path_image = "med_prescritos.png", vetor_metas = c(1,-1))
+
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de erros na prescrição de medicamentos}
+\includegraphics[width=0.7\textwidth]{Imagens/med_prescritos.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: máximo aceitavel de 1\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+medicamentos_dispensados_total = ler_excel("../Indicadores_2021.xlsx", sheet = "Medicamentos_dispensados", coluna_data = "Mês")%>% 
+  filter(Programa == programa) 
+
+medicamentos_dispensados_erros = data_notific 
+
+#source("../utils.R", encoding = "UTF-8")
+grafico_taxa(data_num = medicamentos_dispensados_erros, incidente = "Medicamento", periodo_num = "Data" ,
+             data_den = medicamentos_dispensados_total , var_den = "Dispensados", periodo_den = "Data" ,
+             var_base = "MED_Dispensação",
+             more_filtros = F,
+             var_extra = "", filtro_extra = "",
+             y_max = 30,
+             path_image = "med_dispensados.png", vetor_metas = c(1,-1))
+
+```
+
+\begin{figure}[H]
+\caption{Taxa de erros na dispensação de medicamentos}
+\includegraphics[width=0.7\textwidth]{Imagens/med_dispensados.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: máximo aceitavel de 1\%}
+\end{center}
+
+```{r, echo=F, warning=F, message=F, include=F}
+# #source("../utils.R", encoding = "UTF-8")
+# medicamentos_administrados = ler_excel("../Indicadores_2021.xlsx", sheet = "Medicamentos_administrados", coluna_data = "Mês")%>% 
+#   filter(Programa == programa) 
+# 
+# grafico_metas(medicamentos_administrados,
+#               var_indica =  "Falhas no Registro",
+#               total = "Medicamentos Aprazados",
+#               path_image = "med_administrados.png",
+#               possui_meta = F)   
+
+```
+
+<!-- \begin{figure}[H] -->
+<!-- \caption{Taxa de erros na administração de medicamentos} -->
+<!-- \includegraphics[width=0.7\textwidth]{Imagens/med_administrados.png} -->
+<!-- \end{figure} -->
+
+\newpage
+
+\subsection{PROTOCOLO DE HIGIENIZAÇÃO DAS MÃOS}
+
+ \hspace{1cm} A Higienização das Mãos é uma meta internacional prioritária de segurança, pois é a principal barreira para a transmissão de infecções relacionadas à assistência.
+ 
+ 
+ \hspace{1cm} O Protocolo de Higienização das Mãos integra as recomendações da RDC nº 36 de 25 de Julho de 2013 e compõe o Anexo 1 da Portaria 1.377 de 09 de junho de 2013.
+
+
+```{r, echo=F, warning=F, message=F}
+
+indicadores = ler_excel("../Indicadores_2021.xlsx", sheet = "Higienização das mãos", coluna_data = "Mês") %>% 
+  filter(Programa == programa)
+```
+
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+grafico_linhas(indicadores, 
+               variavel = "Taxa",
+               path_image = "higienizacao_pediatria.png", 
+               metas = 20)
+
+```
+
+\begin{figure}[H]
+\caption{Consumo de preparação alcoólica (ml) por paciente-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/higienizacao_pediatria.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 20 ml por paciente-dia}
+\end{center}
+
+\subsubsection{CONSIDERAÇÕES}
+
+A higienização das mãos é uma importante barreira na prevenção de infecções cruzadas. Os Cinco Momentos recomendados pela OMS são:
+
+
+\begin{enumerate}
+    \item Antes do contato com o paciente;
+    \item Antes da realização de procedimento asséptico;
+    \item O risco de exposição a fluidos corporais;
+    \item Contato com o paciente;
+    \item Contato com áreas próximas ao paciente.
+\end{enumerate}
+
+\fbox{\begin{minipage}{45em}
+Lembramos que a técnica correta de higiene de mãos também envolve o tempo (40-60 segundos: água e sabão; 20-30 segundos: preparação alcóolica) e o NÃO USO de adornos.
+\end{minipage}}
+
+\newpage
+\subsection{PROTOCOLO DE PREVENÇÃO DE QUEDAS}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")%>% 
+  filter(Programa == programa) 
+
+quedas = data_notific  
+
+grafico_taxa(data_num = quedas, incidente = "Queda", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = F,
+             divisor = 1000,
+             var_extra = "", filtro_extra = "",
+             path_image = "quedas_pacientes_dia.png", vetor_metas = c(-1.5,-3.5))
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de quedas por mil pacientes-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/quedas_pacientes_dia.png}
+\end{figure}
+
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")%>% 
+  filter(Programa == programa) 
+
+quedas = data_notific 
+#source("../utils.R", encoding = "UTF-8")
+grafico_taxa(data_num = quedas, incidente = "Queda", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = T,
+             divisor = 1000,
+             var_extra = "CLASSIFICA", filtro_extra = "Evento Adverso",
+             path_image = "queda_pacientes_dia.png", vetor_metas = c(-0.5,-1))
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de quedas com dano por mil pacientes-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/queda_pacientes_dia.png}
+\end{figure}
+
+
+```{r, echo=F, warning=F, message=F, results="asis", include=T}
+
+data_notific = ler_excel("../Notificações.xlsx") %>%
+  filter(PROGRAMA == programa)
+
+#source("../Scripts/tabelas.R", encoding = "UTF-8")
+data = data_notific
+
+
+data_queda = double_table(data,
+               incidente = "Queda",
+               var_indica = "CLASSIFICA", var_explica = "ano_mes",
+               caption = "número de quedas com e sem dano", gerar_kable = F)
+
+
+quedas = data_quedas(data_queda, mes, anos, caption = "Distribuição do número de quedas")
+
+quedas
+```
+
+\newpage 
+\subsection{PROTOCOLO DE PREVENÇÃO DE LESÃO POR PRESSÃO}
+
+```{r, echo=F, warning=F, message=F, include=F}
+
+
+lesao_pressao = ler_excel("../Indicadores_2021.xlsx", sheet = "RISCO LP_PLANO_SETORES", coluna_data = "Mês") %>% 
+   filter(Programa == programa)
+
+grafico_metas(lesao_pressao,
+              var_indica = "avaliado admissão",
+              total = "Internações",
+              path_image ="lesao_pressao.png",
+              metas = 0.9)
+```
+
+
+\begin{figure}[H]
+\caption{Percentual de pacientes submetidos à avaliação do risco de lesão por pressão à admissão}
+\includegraphics[width=0.7\textwidth]{Imagens/lesao_pressao.png}
+\end{figure}
+
+\begin{center}
+ \textbf{Meta: 90\%}
+\end{center}
+
+
+```{r, echo=F, warning=F, message=F, include=F}
+#source("../utils.R", encoding = "UTF-8")
+
+paciente_dia = ler_excel("../Indicadores_2021.xlsx", sheet = "PACIENTE DIA", coluna_data = "Mês")%>% 
+  filter(Programa == programa) 
+
+lesao = data_notific 
+
+grafico_taxa(data_num = lesao, incidente = "Lesão por pressão", periodo_num = "Data" ,
+             data_den = paciente_dia , var_den = "Paciente/dia", periodo_den = "Data" ,
+             more_filtros = T,
+             divisor = 1000,
+             var_extra  = "LPRES_Tipo", filtro_extra = "Em proeminências ósseas",
+             path_image = "lesaoPressao_pacientes_dia.png", vetor_metas = c(-1,-1))
+```
+
+
+\begin{figure}[H]
+\caption{Taxa de Lesão por Pressão por mil pacientes-dia}
+\includegraphics[width=0.7\textwidth]{Imagens/lesaoPressao_pacientes_dia.png}
+\end{figure}
+
+
+
+\newpage
+\subsection{PROTOCOLO DE SEGURANÇA NA TERAPIA NUTRICIONAL ENTERAL}
+```{r, include=F, echo=F}
+
+nutricional = ler_excel("../TerapiaNutricional2021.xlsx", sheet = "Indicadores_R", coluna_data = "Mês") %>% 
+    filter(Programa == programa) %>% 
+    filter(ano == anos)
+
+```
+
+
+
+
+```{r, echo=F, warning=F, message=F}
+#source("../Scripts/utils.R", encoding = "UTF-8")
+
+tabela_taxas(nutricional,
+             var1 = "Notificações de retirada acidental e obstrução",
+             var2 = "Dias com Cateter Nasoentérico",
+             caption = "Incidência de Perda do CNE nos pacientes em TNE")
+
+tabela_taxas(nutricional,
+             var1 ="Não conformidades no processo de TNE",
+             var2 ="Dias em uso de TNE", 
+             caption = "Taxa de não conformidade no processo de TNE")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes em TNE com diarreia",
+             var2 ="Pacientes em uso TNE", 
+             caption = "Taxa de pacientes com diarréia recebendo TNE")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes em TNE com Jejum >24h",
+             var2 ="Pacientes em uso TNE",
+             caption = "Frequência de jejum >48h em pacientes com TNE")
+
+tabela_taxas(nutricional,
+             var1 ="Pacientes com volume de TNE>70%",
+             var2 ="Pacientes em uso TNE", 
+             caption = "Percentual de pacientes recebendo volume de NE > 70\\% do prescrito.")
+
+  
+```
+
+
+
+\newpage
+
+ \subsection{NOTIFICAÇÃO DE INCIDENTES}
+
+ \hspace{1cm}  A notificação de incidentes contribui para a gestão de risco, pois permite o conhecimento dos padrões e semelhanças dos eventos possibilitando uma intervenção direcionada e objetiva. Nem todo incidente notificado gera danos ao paciente e, nem todos os incidentes podem ser evitados. Mas, mediante a notificação, pode-se propor a revisão dos processos no intento de melhorá-los. 
+  
+  
+ \hspace{1cm}  A notificação de incidentes pode ser feita por qualquer profissional de saúde nos seguintes locais: Sistema de Enfermarias e Sistema de Informação Hospitalar (SIH) havendo total sigilo do notificador. As notificações realizadas no ano estão ilustradas abaixo:
+ 
+ \vspace{0.5cm}
+
+```{r, echo=F, warning=F, message=F,results = "asis"}
+#source("../utils.R", encoding = "UTF-8")
+
+#data = data_notific %>%
+#    filter(ano == anos)
+
+tables = multiple_tables(data, var_indica = 'Tipo_incidente', var_explica = "CLASSIFICA")
+
+captions = c('Notificações de Evento Adverso realizadas pelo setor',
+             'Notificações de Incidente sem dano realizadas pelo setor',
+             'Notificações de Quase um erro (Near Miss) realizadas pelo setor')
+
+
+for(x in 1:length(captions)) print(table_generator(tables[[x]],captions[x],
+                                                   latex_options = c("HOLD_position", "scale_down")))
+
+
+
+```
+
+
